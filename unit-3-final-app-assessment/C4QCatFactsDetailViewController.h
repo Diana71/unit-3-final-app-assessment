@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface C4QCatFactsDetailViewController : UIViewController
+@property (nonatomic) NSString *catFactCellSelected;
 
 @end

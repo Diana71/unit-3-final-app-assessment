@@ -20,7 +20,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.onwardButton.hidden = self.view.backgroundColor != [UIColor greenColor];
+//    self.onwardButton.hidden = self.view.backgroundColor != [UIColor greenColor];
 }
 
 @end
