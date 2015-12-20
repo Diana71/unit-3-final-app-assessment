@@ -19,9 +19,6 @@ const CGFloat estimatedRowHeight = 240.0;
 @interface C4QCatFactsTableViewController ()<C4QCatFactsCustomTableViewCellDelegate>
 @property (nonatomic) NSMutableArray *catFactsArray;
 @property (nonatomic) NSMutableArray *savedFacts;
-//@property (nonatomic) NSMutableArray *temporaryArray;
-@property (nonatomic) BOOL isNewFact;
-@property (nonatomic) NSString *selectedFactForSave;
 
 @end
 
@@ -35,18 +32,21 @@ const CGFloat estimatedRowHeight = 240.0;
     self.savedFacts = [[NSMutableArray alloc] init];
 
     [self setupTableViewUI];
-    
     [self fetchingCatsData];
     
-    
-  
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:YES];
-
+    NSLog(@"saved fcts %@", self.savedFacts);
+    [self showSavedFacts];
     [self.tableView reloadData];
 
+}
+
+-(void)showSavedFacts {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    self.savedFacts = [NSMutableArray arrayWithArray:[defaults objectForKey:savedFactsKey]];
 }
 
 #pragma mark - Fetch data
@@ -78,9 +78,6 @@ const CGFloat estimatedRowHeight = 240.0;
     }];
 }
 
-
-
-
 #pragma mark - TableView UI
 -(void)setupTableViewUI{
     UINib *nib = [UINib nibWithNibName:@"C4QCatFactsTvc" bundle:nil];
@@ -95,13 +92,7 @@ const CGFloat estimatedRowHeight = 240.0;
     tempImageView.alpha = 0.5;
     self.tableView.backgroundView = tempImageView;
 
-     }
-
-
-
-
-
-
+}
 
 #pragma mark - Table view data source
 
@@ -117,18 +108,26 @@ const CGFloat estimatedRowHeight = 240.0;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-   C4QCatFactsCustomTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CatFactIdentifier"];
     
-    cell.delegate = self;
+   C4QCatFactsCustomTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CatFactIdentifier"];
+     cell.delegate = self;
     cell.index = indexPath.row;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     [[cell contentView] setBackgroundColor:[UIColor clearColor]];
     [[cell backgroundView] setBackgroundColor:[UIColor clearColor]];
     [cell setBackgroundColor:[UIColor clearColor]];
     
-
     cell.catFactsDescription.text = self.catFactsArray[indexPath.row];
-    
+
+    if ([self.savedFacts containsObject:cell.catFactsDescription.text]) {
+        [cell.catboxChecked setImage:[UIImage imageNamed:@"checkboxSelected"] forState:UIControlStateNormal ];
+        cell.catboxChecked.enabled = NO;
+    } else {
+        cell.catboxChecked.enabled = YES;
+
+    }
+
+
     return cell;
 }
 
@@ -143,84 +142,23 @@ const CGFloat estimatedRowHeight = 240.0;
 }
 
 -(void)selectedFactToSave:(NSInteger)index {
-    NSLog(@"passed %ld",index);
 
-    self.selectedFactForSave = self.catFactsArray[index];
-    
-    NSLog(@"self.savedFacts %@", self.savedFacts);
-    NSLog(@"self.selectedFactForSave %@", self.selectedFactForSave);
-
-    
-    [self.savedFacts addObject:self.selectedFactForSave];
+    [self.savedFacts addObject:self.self.catFactsArray[index]];
     
     [[NSUserDefaults standardUserDefaults] setObject:self.savedFacts forKey:savedFactsKey];
     
-    NSLog(@"saved %@",self.savedFacts);
      [self savedNewFactAlert];
 }
 
-
-
 - (IBAction)saveButtonTapped:(UIBarButtonItem *)sender {
     
-    NSLog(@"tapped");
-    
     C4QSavedFactsTableViewController *savedVC = [self.storyboard instantiateViewControllerWithIdentifier:@"SavedFactsID"];
-    
-    
-   
-    savedVC.saveThatFact = [NSMutableArray arrayWithArray:self.catFactsArray];
-//    NSLog(@"saveThatFact %@",savedVC.saveThatFact);
-    
-    NSArray *array = [[NSUserDefaults standardUserDefaults] objectForKey:savedFactsKey];
-    
-//    if(!array)
-//    {
-//        NSLog(@"ifff ");
-//        [[NSUserDefaults standardUserDefaults] setObject:self.savedFacts forKey:savedFactsKey];
-//    }
-//    else
-    
-        NSLog(@"ifff ");
-
-        if([self isNewFact])
-        {
-            NSLog(@"it's new");
-
-            NSMutableArray *savedBefore = [NSMutableArray arrayWithArray:array];
-            [savedBefore addObject:self.selectedFactForSave];
-            
-            NSLog(@"savedBefore %@",savedBefore);
-
-            
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:savedFactsKey];
-            
-            [[NSUserDefaults standardUserDefaults] setObject:savedBefore forKey:savedFactsKey];
-        
-    }
-    
+    savedVC.savedFacts = self.savedFacts;
     [self.navigationController pushViewController:savedVC animated:YES];
 }
 
--(BOOL)newFact
-{
-    self.isNewFact = NO;
-    
-    NSArray *allSavedStories = [[NSUserDefaults standardUserDefaults] objectForKey:savedFactsKey];
-    
-    for(int i = 0; i < self.savedFacts.count; i++)
-    {
-        //if it's new fact
-         if(![allSavedStories containsObject:self.savedFacts[i]])
-        {
-            self.isNewFact = YES;
-            break;
-        }
-    }
-    return self.isNewFact;
- }
-
 -(void) savedNewFactAlert {
+    
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Saved!" message:@"Successfully saved new story" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {

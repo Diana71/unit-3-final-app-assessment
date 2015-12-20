@@ -10,7 +10,6 @@
 #define savedFactsKey @"SavedFacts"
 
 @interface C4QSavedFactsTableViewController ()
-@property (nonatomic) NSMutableArray *savedFactsArray;
 
 @end
 
@@ -39,7 +38,7 @@
 -(void)loadSavedData {
     NSArray *savedFactsCopy = [[NSUserDefaults standardUserDefaults] objectForKey:savedFactsKey];
     
-    self.savedFactsArray = savedFactsCopy ? [NSMutableArray arrayWithArray:savedFactsCopy] : [NSMutableArray new];
+    self.savedFacts = savedFactsCopy ? [NSMutableArray arrayWithArray:savedFactsCopy] : [NSMutableArray new];
     [self.tableView reloadData];
 }
 
@@ -67,7 +66,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.savedFactsArray.count;
+    return self.savedFacts.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -78,7 +77,7 @@
     [cell setBackgroundColor:[UIColor clearColor]];
 
     
-    cell.textLabel.text = self.savedFactsArray[indexPath.row];
+    cell.textLabel.text = self.savedFacts[indexPath.row];
     cell.textLabel.textColor = [UIColor whiteColor];
     return cell;
 }
@@ -92,7 +91,7 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [self.savedFactsArray removeObjectAtIndex:indexPath.row];
+        [self.savedFacts removeObjectAtIndex:indexPath.row];
         [self.tableView reloadData];
     }
     
@@ -101,7 +100,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:YES];
     [[NSUserDefaults standardUserDefaults]removeObjectForKey:savedFactsKey];
-    [[NSUserDefaults standardUserDefaults] setObject:self.savedFactsArray forKey:savedFactsKey];
+    [[NSUserDefaults standardUserDefaults] setObject:self.savedFacts forKey:savedFactsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

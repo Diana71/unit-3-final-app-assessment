@@ -10,6 +10,6 @@
 
 @interface C4QSavedFactsTableViewController : UITableViewController
 
-@property (nonatomic) NSMutableArray *saveThatFact;
+@property (nonatomic) NSMutableArray *savedFacts;
 
 @end

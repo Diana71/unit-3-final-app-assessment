@@ -21,11 +21,10 @@
     // Configure the view for the selected state
 }
 - (IBAction)catBoxChecked:(UIButton *)sender {
-    NSLog(@"checked ");
     
-    NSLog(@"should pass %ld",self.index);
     [self.catboxChecked setImage:[UIImage imageNamed:@"checkboxSelected"]
               forState:UIControlStateNormal];
+    self.catboxChecked.enabled = NO;
     [self.delegate selectedFactToSave:self.index];
 }
 

@@ -22,9 +22,7 @@
                             <constraint firstAttribute="width" constant="40" id="nvg-jB-9ob"/>
                         </constraints>
                         <state key="normal" backgroundImage="checkbox"/>
-                        <state key="disabled" backgroundImage="checkbox"/>
                         <state key="selected" backgroundImage="checkboxSelected"/>
-                        <state key="highlighted" backgroundImage="checkboxSelected"/>
                         <connections>
                             <action selector="catBoxChecked:" destination="167-bA-9d1" eventType="touchUpInside" id="nyY-J1-OdG"/>
                         </connections>
